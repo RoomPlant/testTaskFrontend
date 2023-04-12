@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import styles from "./Characteristics.module.css";
 import characteristicsMap from "../../misc/characteristicsMap";
-import { objectKeys } from "../../app/store";
+import { objectKeys } from "../../misc/customFunctions/objectKeysTyped";
 import CharacteristicsRow from "../CharacteristicsRow/CharacteristicsRow";
 import { useSelector } from "react-redux";
 import { selectSelectedDevices } from "../../app/reducers/reducer";
@@ -17,7 +17,7 @@ const Characteristics = ({ onlyDifferences }: CharacteristicsProps) => {
 	useEffect(() => {
 		const differences = new Map(initialState);
 		if (onlyDifferences) {
-			objectKeys<typeof selectedDevices[0]>(selectedDevices[0]).forEach((property) => {
+			objectKeys(selectedDevices[0]).forEach((property) => {
 				differences.set(property, !selectedDevices.every((device, index) => {
 					if (index !== 0) {
 						return device[property] === selectedDevices[0][property]
@@ -27,17 +27,18 @@ const Characteristics = ({ onlyDifferences }: CharacteristicsProps) => {
 		}
 		setShouldDisplay(differences);
 	}, [selectedDevices, onlyDifferences, initialState])
+	const content = useMemo(() => (
+		objectKeys(selectedDevices[0]).filter((property) => (
+			Boolean(characteristicsMap.get(property))
+		)).map((property) => (
+			shouldDisplay.get(property) ? <CharacteristicsRow key={property} selectedDevices={selectedDevices} property={property} /> : ""
+		))
+	), [selectedDevices, shouldDisplay])
 
 	return (
 		<div className={styles.content}>
 			<div className={styles.list}>
-				{
-					objectKeys<typeof selectedDevices[0]>(selectedDevices[0]).filter((property) => (
-						Boolean(characteristicsMap.get(property))
-					)).map((property) => (
-						shouldDisplay.get(property) ? <CharacteristicsRow key={property} selectedDevices={selectedDevices} property={property} /> : ""
-					))
-				}
+				{content}
 			</div>
 		</div>
 	)

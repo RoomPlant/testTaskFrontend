@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from './DisplayNumber.module.css';
 import { selectDeviceListLength, selectNumberOfDevices } from "../../app/reducers/reducer";
 import { changeNumberOfDevices } from "../../app/actions/actions";
@@ -19,19 +19,20 @@ const DisplayNumber = () => {
 	const handleClick = useCallback((variant: number) => {
 		dispatch(changeNumberOfDevices(variant))
 	}, [dispatch])
+	const content = useMemo(() => (
+		[2, 3, 4, 5, 6].map((variant) => (
+			amountVatiants >= variant ?
+				<p className={selection[variant - 2] ? styles.active + ' ' + styles.variant : styles.variant}
+					key={variant}
+					onClick={() => handleClick(variant)} >{variant}
+				</p> : ""
+		))
+	), [amountVatiants, handleClick, selection])
 
 	return (
 		<div className={styles.displayNumber}>
 			<p>Отобразить товары: </p>
-			{
-				[2, 3, 4, 5, 6].map((variant) => (
-					amountVatiants >= variant ?
-						<p className={selection[variant - 2] ? styles.active + ' ' + styles.variant : styles.variant}
-							key={variant}
-							onClick={() => handleClick(variant)} >{variant}
-						</p> : ""
-				))
-			}
+			{content}
 		</div>
 	)
 }

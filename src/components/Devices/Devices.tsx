@@ -20,24 +20,25 @@ const Devices = () => {
 	useOutsideClick(buttonsRef, () => {
 		setShouldDisplay(initialState)
 	});
+	const content = useMemo(() => (
+		selectedDevices.map((device, index) => (
+			<div key={device.uid} className={styles.device}>
+				<div className={styles.topPart}>
+					<img className={styles.image} alt="" src={device.image} />
+					{deviceListLength > selectedDevices.length ?
+						<div ref={ref => buttonsRef.current[index] = ref}>
+							<button className={styles.button} onClick={() => handleClick(index)} />
+							{shouldDisplay[index] ? <ComboBox index={index} closeFunction={() => setShouldDisplay(initialState)} /> : ""}
+						</div> : ""}
+				</div>
+				<p className={styles.deviceName}>{device.fullName}</p>
+			</div>
+		))
+	), [deviceListLength, handleClick, initialState, selectedDevices, shouldDisplay])
 
 	return (
 		<div className={styles.list}>
-			{
-				selectedDevices.map((device, index) => (
-					<div key={device.uid} className={styles.device}>
-						<div className={styles.topPart}>
-							<img className={styles.image} alt="" src={device.image} />
-							{deviceListLength > selectedDevices.length ?
-								<div ref={ref => buttonsRef.current[index] = ref}>
-									<button className={styles.button} onClick={() => handleClick(index)} />
-									{shouldDisplay[index] ? <ComboBox index={index} closeFunction={() => setShouldDisplay(initialState)} /> : ""}
-								</div> : ""}
-						</div>
-						<p className={styles.deviceName}>{device.fullName}</p>
-					</div>
-				))
-			}
+			{content}
 		</div>
 	)
 }

@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./ComboBox.module.css";
 import { selectSearchedDevices, selectSelectedDevices } from "../../app/reducers/reducer";
 import { useDispatch } from "../../app/store";
@@ -26,17 +26,20 @@ const ComboBox = ({ index, closeFunction }: ComboBoxProps) => {
 	useEffect(() => {
 		dispatch(updateSearchedDevices());
 	}, [selectedDevices, dispatch])
+	const content = useMemo(() => (
+		searchedDevices.map((device, searchIndex) => (
+			<div key={device.uid} className={styles.device}>
+				<button onClick={() => handleClick(index, searchIndex)} className={styles.button} />
+				<img className={styles.image} src={device.image} alt="" />
+				<p>{device.fullName}</p>
+			</div>
+		))
+	), [handleClick, index, searchedDevices])
 
 	return (
 		<div className={styles.comboBox}>
 			<input value={value} onChange={handleInput} className={styles.searchBar} placeholder="Поиск" />
-			{searchedDevices.map((device, searchIndex) => (
-				<div key={device.uid} className={styles.device}>
-					<button onClick={() => handleClick(index, searchIndex)} className={styles.button} />
-					<img className={styles.image} src={device.image} alt="" />
-					<p>{device.fullName}</p>
-				</div>
-			))}
+			{content}
 		</div>
 	)
 }
